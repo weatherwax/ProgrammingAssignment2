@@ -2,16 +2,18 @@
 ## object able to store its inverse.
 
 
-## This function creates an object able to store and retrieve both
-## a matrix and its inverse
+## This function creates an object (consisting of a list 
+## of functions and two global variables) able to store and 
+## retrieve both a matrix and its inverse
 
 makeCacheMatrix <- function(x = matrix()) {
   
         # Set the inverse to NULL when creating the CacheMatrix
+        # in this environment
         ivs <- NULL
         
         # Set function that stores the matrix and its inverse in  
-        # the calling environment
+        # the global environment
         set <- function(y) {
                 x <<- y
                 ivs <<- NULL
@@ -20,7 +22,7 @@ makeCacheMatrix <- function(x = matrix()) {
         # Get function that returns the matrix
         get <- function() x
         
-        # function to store the inverse
+        # function to store the inverse (in the global environment)
         setinverse <- function(inverse) ivs <<- inverse
         
         # function to retrieve the inverse
@@ -36,7 +38,13 @@ makeCacheMatrix <- function(x = matrix()) {
 
 ## This function returns a matrix's inverse. If the inverse has 
 ## been calculated previously, it returns the inverse from the
-## cache
+## cache. It takes as arguments an object created by using the
+## function makeCacheMatrix and any extra arguments for solve()
+## aside the "a" and "b" (If extra arguments are used, they won't
+## be taken into account when calling again cacheSolve in
+## succesive calls, even if they are different)
+## If the numeric matrix is not invertible, an error will be 
+## produced
 
 cacheSolve <- function(x, ...) {
   
@@ -55,9 +63,9 @@ cacheSolve <- function(x, ...) {
         
         # Solve for the inverse matrix
         # assuming that the matrix supplied is always invertible
-        inverse <- solve(data,diag(dim(data)[1]), ...)
+        inverse <- solve(a = data,b = diag(dim(data)[1]), ...)
         
-        # Store the inverse matrix
+        # Store the inverse matrix via the set function
         x$setinverse(inverse)
         
         # Return the inverse matrix
